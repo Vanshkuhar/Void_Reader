@@ -375,11 +375,26 @@ class _DcoderState extends State<Dcoder> {
     loader(widget.filepath);
   }
 
+  // Add this method to reset state when filepath changes
+  @override
+  void didUpdateWidget(Dcoder oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.filepath != widget.filepath) {
+      // Reset state and reload when filepath changes
+      setState(() {
+        isLoading = true;
+        bytes = null;
+        title = 'Title will be here';
+        author = '';
+      });
+      loader(widget.filepath);
+    }
+  }
+
   Future<void> debugPath() async {
     final appDir = await getExternalStorageDirectory();
     print('App directory: ${appDir?.path}');
     
-    // List ALL files
     final dir = Directory(appDir!.path);
     print('All files in directory:');
     await for (var entity in dir.list()) {
@@ -388,7 +403,6 @@ class _DcoderState extends State<Dcoder> {
     }
   }
 
-  // In-memory patch loader
   Future<epu.Epub> loadPatchedEpub(File file) async {
     final bytes = await file.readAsBytes();
     final archive = ZipDecoder().decodeBytes(bytes);
@@ -412,11 +426,17 @@ class _DcoderState extends State<Dcoder> {
     return epu.Epub.fromBytes(asUint8List);
   }
 
-  // The loader itself
   Future<void> loader(String filepath) async {
     try {
       final file = File(filepath);
-      print(await file.exists());
+      if (!await file.exists()) {
+        // File doesn't exist, set error state
+        setState(() {
+          isLoading = false;
+          title = 'File not found';
+        });
+        return;
+      }
 
       epu.Epub? epub;
       try {
@@ -427,41 +447,44 @@ class _DcoderState extends State<Dcoder> {
         epub = epu.Epub.fromFile(file);
       }
 
-      // Extract all images with robust normalization/fuzzy logic
       final extractedImages = await ImageService.extractAllImages(epub);
 
-      // Find cover image by all normalized/fuzzy means
       Uint8List? coverBytes;
       if (epub.cover?.href != null) {
         final coverInfo = ImageService.findImageByPath(epub.cover!.href, extractedImages);
         coverBytes = coverInfo?.data;
       }
 
-      // Fallback: use first available image if cover not found
       if (coverBytes == null && extractedImages.isNotEmpty) {
         coverBytes = extractedImages.values.first.data;
       }
 
-      setState(() {
-        title = epub!.title;
-        coverItem = epub.cover;
-        bytes = coverBytes;
-        print('Cover bytes length: ${bytes?.length}');
-        isLoading = false;
-        author = epub.authors.join(', ');
-      });
+      // Only update state if widget is still mounted and filepath matches
+      if (mounted && widget.filepath == filepath) {
+        setState(() {
+          title = epub!.title;
+          coverItem = epub.cover;
+          bytes = coverBytes;
+          print('Cover bytes length: ${bytes?.length}');
+          isLoading = false;
+          author = epub.authors.join(', ');
+        });
+      }
     } catch (e) {
       print('Error loading EPUB: $e');
-      setState(() {
-        isLoading = false;
-        title = 'Error: $e';
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          title = 'Error: $e';
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final heroTag = 'epub-cover-${widget.filepath}';
+    // Use file path hash for unique Hero tag instead of just filepath
+    final heroTag = 'epub-cover-${widget.filepath.hashCode}';
     
     return Consumer2<EpubReaderProvider, ThemeProvider>(
       builder: (context, readerProvider, themeProvider, child) {
@@ -562,17 +585,32 @@ class _DcoderState extends State<Dcoder> {
                                 ),
                               );
 
-                              if (confirm == true) {
-                                await File(widget.filepath).delete();
-                                Navigator.pop(context);
+                              if (confirm == true && mounted) {
+                                try {
+                                  await File(widget.filepath).delete();
+                                  if (mounted) {
+                                    Navigator.pop(context);
 
-                                // Get provider and remove from list
-                                final epubProvider = Provider.of<EpubReaderProvider>(context, listen: false);
-                                List<String> updatedFiles = List.from(epubProvider.files);
-                                updatedFiles.remove(widget.filepath);
+                                    // Get provider and remove from list
+                                    final epubProvider = Provider.of<EpubReaderProvider>(context, listen: false);
+                                    List<String> updatedFiles = List.from(epubProvider.files);
+                                    updatedFiles.remove(widget.filepath);
 
-                                // Update provider immediately
-                                epubProvider.filesSetter(updatedFiles);
+                                    // Update provider immediately
+                                    epubProvider.filesSetter(updatedFiles);
+                                    
+                                    // Show success message
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Book deleted successfully')),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Failed to delete: $e')),
+                                    );
+                                  }
+                                }
                               }
                             },
                           ),
@@ -674,6 +712,7 @@ class _DcoderState extends State<Dcoder> {
   }
 }
 
+// Keep your existing _LoadingSkeleton class as is
 class _LoadingSkeleton extends StatefulWidget {
   final double radius;
   const _LoadingSkeleton({required this.radius});
