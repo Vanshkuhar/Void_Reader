@@ -107,36 +107,49 @@ class _LibrarypageState extends State<Librarypage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer2<EpubReaderProvider, ThemeProvider>(
-      builder: (context, readerProvider, themeProvider, child) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('My books'),
-            centerTitle: true,
-            actions: [
-              TextButton.icon(
-                onPressed: () {
-                  saveFileToAppDirectory(context);
-                },
-                label: Text('Import book'),
-                icon: Icon(Icons.add),
-              ),
-            ],
-          ),
-          body: Padding(
-            padding: EdgeInsets.only(left: 60, right: 60),
-            child: GridView.count(
-              crossAxisCount: 2,
-              childAspectRatio: 0.6,
-              children: List.generate(
-                readerProvider.files.length,
-                (index) => Dcoder(filepath: readerProvider.files[index]),
-              ),
+Widget build(BuildContext context) {
+  return Consumer2<EpubReaderProvider, ThemeProvider>(
+    builder: (context, readerProvider, themeProvider, child) {
+      final hasFiles = readerProvider.files.isNotEmpty;
+
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('My books'),
+          centerTitle: true,
+          actions: [
+            TextButton.icon(
+              onPressed: () {
+                saveFileToAppDirectory(context);
+              },
+              label: Text('Import book'),
+              icon: Icon(Icons.add),
             ),
-          ),
-        );
-      },
-    );
-  }
+          ],
+        ),
+        body: hasFiles
+            ? Padding(
+                padding: EdgeInsets.only(left: 60, right: 60, top: 20),
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.6,
+                  children: List.generate(
+                    readerProvider.files.length,
+                    (index) => Dcoder(filepath: readerProvider.files[index]),
+                  ),
+                ),
+              )
+            : Center(
+                child: Text(
+                  'Import your first book to get started',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                      ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+      );
+    },
+  );
+}
+
 }

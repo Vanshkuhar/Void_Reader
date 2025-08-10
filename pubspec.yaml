@@ -58,8 +58,7 @@ dependencies:
   mime: ^2.0.0
   flutter_html_svg: ^3.0.0
   rename_app: ^1.6.5
-  # epub_plus: ^5.0.1
-  # document_picker: ^0.0.5
+  
   
 # dependency_overrides:
 #   image: ^4.1.7  # Force the newer version required by epub_plus
@@ -68,17 +67,19 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^5.0.0
   change_app_package_name: ^1.5.0
+  flutter_launcher_icons: any
+
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+# flutter_launcher_icons:
+#   android: true
+#   ios: true
+#   image_path: "assets/icons/Void.png"
+
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -89,10 +90,7 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-    - assets/sample.epub
-    - assets/sample1.epub
-    - assets/hello1.epub
+  # assets:
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
