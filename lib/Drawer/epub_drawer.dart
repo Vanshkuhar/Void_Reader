@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'epub_models.dart';
-import 'provider.dart';
+import '../Content Extraction/epub_models.dart';
+import '../Provider/provider.dart';
 import 'package:provider/provider.dart';
 
 class EpubDrawer extends StatelessWidget {

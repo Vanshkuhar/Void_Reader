@@ -3,12 +3,12 @@ import 'package:flutter/material.dart'  hide ImageInfo;
 import 'package:epub_decoder/epub_decoder.dart' as epu;
 import 'dart:convert';
 import 'package:provider/provider.dart';
-import 'provider.dart';
-import 'epub_models.dart';
-import 'epub_service.dart';
-import 'image_service.dart';
-import 'epub_content_widget.dart';
-import 'epub_drawer.dart';
+import '../Provider/provider.dart';
+import '../Content Extraction/epub_models.dart';
+import '../Content Extraction/epub_service.dart';
+import '../Content Extraction/image_service.dart';
+import '../Content Extraction/epub_content_widget.dart';
+import '../Drawer/epub_drawer.dart';
 import 'dart:io';
 import 'package:archive/archive_io.dart';
 

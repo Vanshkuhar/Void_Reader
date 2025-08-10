@@ -1,7 +1,7 @@
-import 'package:epuber/Librarypage.dart';
+import 'package:epuber/Home%20Page/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'provider.dart';
+import 'Provider/provider.dart';
 
 
 
@@ -108,7 +108,7 @@ final ThemeData dark = ThemeData(
       themeMode: themeProvider.themeMode,
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
-        home: Librarypage() );
+        home: Librarypage());
     });}
    
 }

@@ -173,7 +173,7 @@
 
 
 
-import 'package:epuber/provider.dart';
+import 'package:epuber/Provider/provider.dart';
 import 'package:flutter/material.dart' hide ImageInfo;
 import 'package:flutter_html/flutter_html.dart' as html;
 import 'package:provider/provider.dart';

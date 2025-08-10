@@ -1,6 +1,6 @@
-import 'package:epuber/FileCard.dart';
+import 'package:epuber/EpubReader/FileCard.dart';
 import 'package:flutter/material.dart' hide ImageInfo;
-import 'provider.dart';
+import '../Provider/provider.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
